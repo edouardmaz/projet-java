@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.io.FileWriter;
 
@@ -17,15 +19,14 @@ public class Modele {
 	Map<String, Map> repertoiregenre = new HashMap<>();
 	Map<String, Map> repertoireannée = new HashMap<>();
 
-	public class Musique { // pensez à ajouter des années
+	public class Musique { // pensez à ajouter caracéristique
 		String titre;
 		int dureem;
 		int dureesec;  //pensez à ajouter les dizaine lorsque inexistante à l'affichage
-		int avis;
-		String descr;
+		int avis=0;
+		String descr="aucune";
 
 		public Musique(String t, int dm, int ds, int a, String de) {
-			System.out.println(t);
 			this.titre = t;
 			this.dureem = dm;
 			this.dureesec = ds;
@@ -39,6 +40,19 @@ public class Modele {
 	}
 	
 	public class User{
+		File fic = new File("user.dat");
+		Map<Integer,Integer> prefAnnée=new HashMap();
+		
+		public User() {
+			
+		}
+		
+		public void statAnnée(int an) {
+			if (this.prefAnnée.containsKey(an)) {
+				int s=this.prefAnnée.get(an);
+				this.prefAnnée.replace(an, s++);
+			}
+		}
 		
 	}
 
@@ -133,8 +147,6 @@ public class Modele {
 				int m2= (mu[2].codePointAt(0)-48)*10+mu[2].codePointAt(1)-48;
 				int m3= mu[3].codePointAt(0)-48;
 				Musique a = new Musique(mu[0], m1, m2, m3, mu[4]);
-				System.out.println(mu[0]+" "+mu[1]+":"+mu[2]);
-				System.out.println(a);
 				ajout(a);
 			}
 		}
@@ -170,6 +182,7 @@ public class Modele {
 			} catch (Exception e) {
 			}
 		}
+		ajout(m);
 	}
 
 	public static void main(String[] args) throws IOException {
