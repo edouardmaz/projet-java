@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -12,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="890.0" prefWidth="1315.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="200.0" spacing="20.0" styleClass="white-background" stylesheets="@../../style/style.css" BorderPane.alignment="CENTER">
          <children>
@@ -36,22 +37,14 @@
                </children>
             </HBox>
             <Pane prefHeight="200.0" prefWidth="200.0" />
-            <HBox prefHeight="100.0" prefWidth="200.0">
-               <children>
-                  <Label prefHeight="50.0" prefWidth="163.0" text="Placeholder">
-                     <font>
-                        <Font name="Berlin Sans FB" size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0" />
          </children>
       </HBox>
    </top>
    <left>
       <VBox prefHeight="200.0" prefWidth="250.0" styleClass="white-background" stylesheets="@../../style/style.css" BorderPane.alignment="CENTER">
          <children>
-            <VBox prefHeight="216.0" prefWidth="250.0">
+            <VBox prefHeight="216.0" prefWidth="250.0" VBox.vgrow="ALWAYS">
                <children>
                   <Label prefHeight="50.0" prefWidth="163.0" text="Parcourir">
                      <font>
@@ -64,6 +57,178 @@
                         <Insets left="10.0" />
                      </VBox.margin>
                   </Label>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/icons8-trend-50.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Tendance">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/compass-icon.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Parcourir">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                     <styleClass>
+                        <String fx:value="mouse-moved" />
+                        <String fx:value="selected" />
+                     </styleClass>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/category%20icon.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Categories">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Separator prefWidth="200.0" />
+            <VBox prefHeight="216.0" prefWidth="250.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label prefHeight="50.0" prefWidth="163.0" text="Vos Musiques">
+                     <font>
+                        <Font name="Berlin Sans FB" size="18.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/icons8-video-playlist-50.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Playlists">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/icons8-favorites-50.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Favoris">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/icons8-clock-50.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Historique">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Separator prefWidth="200.0" />
+            <VBox prefHeight="186.0" prefWidth="250.0">
+               <children>
+                  <Label prefHeight="50.0" prefWidth="163.0" text="Profil">
+                     <font>
+                        <Font name="Berlin Sans FB" size="18.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/icons8-user-50.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Profil">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@../../style/style.css" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../img/icons8-settings-50.png" />
+                           </image>
+                        </ImageView>
+                        <Label prefHeight="50.0" prefWidth="163.0" text="Categories">
+                           <font>
+                              <Font name="Berlin Sans FB" size="18.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Label>
+                     </children>
+                  </HBox>
                </children>
             </VBox>
          </children>
