@@ -1,10 +1,16 @@
 import java.util.Dictionary;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,19 +18,24 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.io.FileWriter;
 
-public class Modele {
+public class Modele implements Serializable{
 
+	User user = new User();
+	File fic = new File("user.dat");
 	Map<String, Map> repertoireMus = new HashMap<>();
 	Map<String, Map> repertoireart = new HashMap<>();
 	Map<String, Map> repertoiregenre = new HashMap<>();
 	Map<String, Map> repertoireannée = new HashMap<>();
 
-	public class Musique { // pensez à ajouter caracéristique
+	public class Musique implements Serializable{ // pensez à ajouter caracéristique
 		String titre;
 		int dureem;
-		int dureesec;  //pensez à ajouter les dizaine lorsque inexistante à l'affichage
-		int avis=0;
-		String descr="aucune";
+		int dureesec; // pensez à ajouter les dizaine lorsque inexistante à l'affichage
+		int avis = 0;
+		int ann = 2020;
+		String artist;
+		String langue;
+		String descr = "aucune";
 
 		public Musique(String t, int dm, int ds, int a, String de) {
 			this.titre = t;
@@ -38,30 +49,74 @@ public class Modele {
 			return this.titre + " " + this.dureem + ":" + this.dureesec;
 		}
 	}
-	
-	public class User{
-		File fic = new File("user.dat");
-		Map<Integer,Integer> prefAnnée=new HashMap();
-		
+
+	public class User implements Serializable {
+		private static final long serialVersionUID = 1L;
+		Map<Integer, Integer> prefAnnée = new HashMap();
+
 		public User() {
-			
+
 		}
-		
+
 		public void statAnnée(int an) {
-			if (this.prefAnnée.containsKey(an)) {
-				int s=this.prefAnnée.get(an);
-				this.prefAnnée.replace(an, s++);
+			Map r = this.prefAnnée;
+			if (r.containsKey(an)) {
+				int s = (int) r.get(an);
+				r.replace(an, s+1);
+				if ((int) r.get(an) > (int) r.get(r.get(9901))) {
+					r.replace(9901, an);
+				}
+			} else {
+				r.put(an, 1);
+				if (r.containsKey(9901) == false) {
+					r.put(9901, an);
+				}
 			}
 		}
-		
+
+		public int likeAnn() {
+			int fav = -300000;
+			if (this.prefAnnée.containsKey(9901)) {
+				fav = this.prefAnnée.get(9901);
+			}
+			return fav;
+		}
 	}
 
 	public Modele() {
+		if (fic.exists()) {
 
+			try {
+				FileInputStream fis = new FileInputStream(fic);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+
+				this.user = (Modele.User) ois.readObject();
+				
+				ois.close();
+				fis.close();
+			} catch (IOException | ClassNotFoundException e) {
+				throw new RuntimeException("Impossible de récupérer les données");
+			}
+		}
 	}
 
 	public Modele(Musique[] ms) {
 
+	}
+
+	public void save() {
+		try {
+			this.fic.createNewFile();
+			FileOutputStream fos = new FileOutputStream(fic);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+			oos.writeObject(this.user);
+			
+			oos.close();
+			fos.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Impossible de sauvegarder");
+		}
 	}
 
 	public void ajout(Map r, Musique m, int p) { // creation de table de table
@@ -143,9 +198,9 @@ public class Modele {
 			String[] musbd = bdd.split(";");
 			for (int i = 0; i < musbd.length; i++) {
 				String[] mu = musbd[i].split(",");
-				int m1= mu[1].codePointAt(0)-48;
-				int m2= (mu[2].codePointAt(0)-48)*10+mu[2].codePointAt(1)-48;
-				int m3= mu[3].codePointAt(0)-48;
+				int m1 = mu[1].codePointAt(0) - 48;
+				int m2 = (mu[2].codePointAt(0) - 48) * 10 + mu[2].codePointAt(1) - 48;
+				int m3 = mu[3].codePointAt(0) - 48;
 				Musique a = new Musique(mu[0], m1, m2, m3, mu[4]);
 				ajout(a);
 			}
@@ -185,15 +240,23 @@ public class Modele {
 		ajout(m);
 	}
 
+	public void testlisten(Musique m) {
+		this.user.statAnnée(m.ann);
+	}
+
 	public static void main(String[] args) throws IOException {
 		Modele m = new Modele();
 		m.makeBDD();
-
+		Musique hee = m.new Musique("test", 5, 5, 2, "nope");
 		System.out.println(m.trouve("ab"));
 		System.out.println(m.trouve("abc"));
 		System.out.println(m.trouve("ef"));
 		System.out.println(m.trouveAll());
 
+		//m.testlisten(hee);
+		int test = m.user.prefAnnée.get(2020);
+		System.out.println(test);
+		m.save();
 	}
 
 }
