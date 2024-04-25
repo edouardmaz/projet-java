@@ -17,22 +17,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.io.FileWriter;
+import java.util.PriorityQueue;
 
 public class Modele implements Serializable{
-
+	private static final long serialVersionUID = 1L;
+	
 	User user = new User();
 	File fic = new File("user.dat");
 	Map<String, Map> repertoireMus = new HashMap<>();
 	Map<String, Map> repertoireart = new HashMap<>();
 	Map<String, Map> repertoiregenre = new HashMap<>();
-	Map<String, Map> repertoireannée = new HashMap<>();
+	Map<Integer, ArrayList> repertoireannée = new HashMap<>();
 
 	public class Musique implements Serializable{ // pensez à ajouter caracéristique
+		private static final long serialVersionUID = 1L;
+		
 		String titre;
 		int dureem;
 		int dureesec; // pensez à ajouter les dizaine lorsque inexistante à l'affichage
 		int avis = 0;
-		int ann = 2020;
+		int ann = 2020; // à modifier quand attribut proprement implémenter
 		String artist;
 		String langue;
 		String descr = "aucune";
@@ -58,7 +62,7 @@ public class Modele implements Serializable{
 
 		}
 
-		public void statAnnée(int an) {
+		public void statAnnée(int an) { //s'occupe de mettre à jour la preférence année
 			Map r = this.prefAnnée;
 			if (r.containsKey(an)) {
 				int s = (int) r.get(an);
@@ -74,7 +78,7 @@ public class Modele implements Serializable{
 			}
 		}
 
-		public int likeAnn() {
+		public int likeAnn() { //renvoi l'année favorite
 			int fav = -300000;
 			if (this.prefAnnée.containsKey(9901)) {
 				fav = this.prefAnnée.get(9901);
@@ -95,13 +99,10 @@ public class Modele implements Serializable{
 				ois.close();
 				fis.close();
 			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
 				throw new RuntimeException("Impossible de récupérer les données");
 			}
 		}
-	}
-
-	public Modele(Musique[] ms) {
-
 	}
 
 	public void save() {
@@ -131,6 +132,15 @@ public class Modele implements Serializable{
 				ml.add(m);
 				r.put("list", ml);
 			}
+			if (this.repertoireannée.containsKey(m.ann)) {
+				ArrayList al=(ArrayList) this.repertoireannée.get(m.ann);
+				al.add(m);
+				this.repertoireannée.replace(m.ann, al);
+			}else {
+				ArrayList<Musique> al=new ArrayList<Musique>();
+				al.add(m);
+				r.put(ml, al);
+			}
 		} else {
 			Character az = m.titre.charAt(p);
 			if (r.containsKey(az) == false) {
@@ -141,6 +151,11 @@ public class Modele implements Serializable{
 			}
 			ajout(rep, m, p + 1);
 		}
+	}
+	
+	public void getPref() {
+		int pa=user.likeAnn();
+		Object[] pref= {(Object) pa};
 	}
 
 	public ArrayList trouve(Map r, String titre, int p) {
@@ -161,6 +176,10 @@ public class Modele implements Serializable{
 	public void ajout(Musique m) {
 		ajout(this.repertoireMus, m, 0);
 	}
+	
+	public void preference() {
+		
+	}
 
 	public ArrayList trouve(String titre) {
 		// Musique test=trouve(this.repertoireMus,titre,0);
@@ -168,7 +187,7 @@ public class Modele implements Serializable{
 		return trouve(this.repertoireMus, titre, 0);
 	}
 
-	public ArrayList trouveAll(Map r, String alpha, ArrayList find) {
+	public ArrayList trouveAll(Map r, String alpha, ArrayList find) {//renvoi une liste contenant toutes les musique du répertoire selectionner
 		if (r.containsKey("list")) {
 			find.addAll((Collection) r.get("list"));
 		}
@@ -207,6 +226,7 @@ public class Modele implements Serializable{
 		}
 
 	}
+	
 
 	public void MaJ(Musique m) throws IOException {
 		String update = m.titre + "," + m.dureem + "," + m.dureesec + "," + m.avis + "," + m.descr;
@@ -254,8 +274,6 @@ public class Modele implements Serializable{
 		System.out.println(m.trouveAll());
 
 		//m.testlisten(hee);
-		int test = m.user.prefAnnée.get(2020);
-		System.out.println(test);
 		m.save();
 	}
 
