@@ -28,38 +28,61 @@ public class Modele implements Serializable{
 	Map<String, Map> repertoireart = new HashMap<>();
 	Map<String, Map> repertoiregenre = new HashMap<>();
 	Map<Integer, ArrayList> repertoireannée = new HashMap<>();
+	static enum Genre {kpop,pop,rap,rap_fr};
+	static enum Langue {anglais,français,korean};
+	static enum Annee {a80,a90,a00,a10};
 
-	public class Musique implements Serializable{ // pensez à ajouter caracéristique
+	public class Musique implements Serializable,Comparable<Musique>{ // pensez à ajouter caracéristique
 		private static final long serialVersionUID = 1L;
 		
+		int prefUser;
 		String titre;
-		int dureem;
-		int dureesec; // pensez à ajouter les dizaine lorsque inexistante à l'affichage
-		int avis = 0;
-		int ann = 2020; // à modifier quand attribut proprement implémenter
 		String artist;
-		String langue;
-		String descr = "aucune";
+		Genre genre;
+		Langue langue;
+		Annee annee;
+		Integer duree;
+		Integer avi;
 
-		public Musique(String t, int dm, int ds, int a, String de) {
+		public Musique(String t, String a, Genre g, Langue l, Annee an, Integer d) {
 			this.titre = t;
-			this.dureem = dm;
-			this.dureesec = ds;
-			this.avis = a;
-			this.descr = de;
+			this.artist=a;
+			this.genre=g;
+			this.annee=an;
+			this.langue=l;
+			this.duree=d;
+			this.avi=0;
 		}
 
 		public String toString() {
-			return this.titre + " " + this.dureem + ":" + this.dureesec;
+			return this.titre+" - "+this.artist;
+		}
+
+		@Override
+		public int compareTo(Modele.Musique m) {
+			if (this.prefUser!=m.prefUser) {
+				return this.prefUser-m.prefUser;
+			}else {
+				return this.avis-m.avis;
+			}
 		}
 	}
 
 	public class User implements Serializable {
 		private static final long serialVersionUID = 1L;
 		Map<Integer, Integer> prefAnnée = new HashMap();
+		/*Stack<Genre> prefGenres = new Stack<Genre>();
+		Stack<Annee> prefAnnees = new Stack<Annee>();
+		Stack<Langue> prefLangues = new Stack<Langue>();
+		Stack<String> prefArtistes = new Stack<String>();*/
 
 		public User() {
-
+			/*public User(Stack<Genre> g, Stack<Annee> a, Stack<Langue> l, Stack<String> ar) {
+			this.prefGenres=g;
+			this.prefAnnees=a;
+			this.prefLangues=l;
+			this.prefArtistes=ar;
+		}*/
 		}
 
 		public void statAnnée(int an) { //s'occupe de mettre à jour la preférence année
@@ -77,6 +100,13 @@ public class Modele implements Serializable{
 				}
 			}
 		}
+		
+		/*public void like(Musique m) {
+			this.prefAnnees.add(m.annee);
+			this.prefGenres.add(m.genre);
+			this.prefLangues.add(m.langue);
+			this.prefArtistes.add(m.artist);
+		}*/
 
 		public int likeAnn() { //renvoi l'année favorite
 			int fav = -300000;
@@ -153,9 +183,10 @@ public class Modele implements Serializable{
 		}
 	}
 	
-	public void getPref() {
+	public Object[] getPref() {
 		int pa=user.likeAnn();
 		Object[] pref= {(Object) pa};
+		return pref;
 	}
 
 	public ArrayList trouve(Map r, String titre, int p) {
@@ -177,7 +208,34 @@ public class Modele implements Serializable{
 		ajout(this.repertoireMus, m, 0);
 	}
 	
-	public void preference() {
+	public PriorityQueue preference() {
+		PriorityQueue fp=new PriorityQueue();
+		String[] verifpref={"thisanne"}; //pas sure de cela
+		Object[] userLike=this.getPref();
+		ArrayList pot=new ArrayList(); 
+		for (int i=0;i<userLike.length;i++) {
+			if (i==0) {
+				pot=this.repertoireannée.get(i);
+				for (int j=0;j<userLike.length;j++) {        //<-------utilité pas ouf
+					Musique m=(Modele.Musique) pot.get(j);
+					if (m.ann==(int)userLike[i]) {						
+						m.prefUser++;
+						pot.set(j, m);
+					}
+				}
+			}else {
+				pot=this.repertoireannée.get(i); //<-------------changer les valeur à check
+				for (int j=0;j<userLike.length;j++) {
+					Musique m=(Modele.Musique) pot.get(j);
+					if (m.ann==(int)userLike[i]) {						
+						m.prefUser++;
+						pot.set(j, m);
+					}
+				}
+			}
+		}
+		fp.addAll(pot);
+		return fp;
 		
 	}
 
@@ -272,6 +330,7 @@ public class Modele implements Serializable{
 		System.out.println(m.trouve("abc"));
 		System.out.println(m.trouve("ef"));
 		System.out.println(m.trouveAll());
+		System.out.println(m.preference());
 
 		//m.testlisten(hee);
 		m.save();
