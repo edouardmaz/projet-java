@@ -18,29 +18,32 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.io.FileWriter;
+import java.util.PriorityQueue;
 
-public class Modele implements Serializable{
-
+public class Mainer implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	User user = new User();
 	File fic = new File("user.dat");
 	Map<String, Map> repertoireMus = new HashMap<>();
 	Map<String, Map> repertoireart = new HashMap<>();
 	Map<String, Map> repertoiregenre = new HashMap<>();
-	Map<String, Map> repertoireannée = new HashMap<>();
+	Map<Integer, ArrayList> repertoireannée = new HashMap<>();
 	static enum Genre {kpop,pop,rap,rap_fr};
 	static enum Langue {anglais,français,korean};
 	static enum Annee {a80,a90,a00,a10};
-	
 
-	public class Musique implements Serializable { // pensez à ajouter caracéristique
+	public class Musique implements Serializable,Comparable<Musique>{ // pensez à ajouter caracéristique
+		private static final long serialVersionUID = 1L;
 		
+		int prefUser;
 		String titre;
 		String artist;
 		Genre genre;
 		Langue langue;
 		Annee annee;
 		Integer duree;
-		Integer avi;// pensez à ajouter les dizaine lorsque inexistante à l'affichage
+		Integer avi;
 
 		public Musique(String t, String a, Genre g, Langue l, Annee an, Integer d) {
 			this.titre = t;
@@ -55,24 +58,37 @@ public class Modele implements Serializable{
 		public String toString() {
 			return this.titre+" - "+this.artist;
 		}
+
+		@Override
+		public int compareTo(Modele.Musique m) {
+			if (this.prefUser!=m.prefUser) {
+				return this.prefUser-m.prefUser;
+			}else {
+				return this.avis-m.avis;
+			}
+		}
 	}
 
 	public class User implements Serializable {
-		
 		private static final long serialVersionUID = 1L;
-		Stack<Genre> prefGenres = new Stack<Genre>();
+		Map<Integer, Integer> prefAnnée = new HashMap();
+		/*Stack<Genre> prefGenres = new Stack<Genre>();
 		Stack<Annee> prefAnnees = new Stack<Annee>();
 		Stack<Langue> prefLangues = new Stack<Langue>();
-		Stack<String> prefArtistes = new Stack<String>();
+		Stack<String> prefArtistes = new Stack<String>();*/
+		Stack<Musique> likes = new Stack<Musique>();
 
-		public User(Stack<Genre> g, Stack<Annee> a, Stack<Langue> l, Stack<String> ar) {
+		public User() {
+			/*public User(Stack<Musique> m, Stack<Genre> g, Stack<Annee> a, Stack<Langue> l, Stack<String> ar) {
 			this.prefGenres=g;
 			this.prefAnnees=a;
 			this.prefLangues=l;
 			this.prefArtistes=ar;
+			this.likes=m;
+		}*/
 		}
 
-		public void statAnnée(int an) {
+		public void statAnnée(int an) { //s'occupe de mettre à jour la preférence année
 			Map r = this.prefAnnée;
 			if (r.containsKey(an)) {
 				int s = (int) r.get(an);
@@ -88,19 +104,35 @@ public class Modele implements Serializable{
 			}
 		}
 		
-		public void like(Musique m) {
+		/*public void like(Musique m) {
 			this.prefAnnees.add(m.annee);
 			this.prefGenres.add(m.genre);
 			this.prefLangues.add(m.langue);
 			this.prefArtistes.add(m.artist);
-		}
+		}*/
 
-		public int likeAnn() {
+		public int likeAnn() { //renvoi l'année favorite
 			int fav = -300000;
 			if (this.prefAnnée.containsKey(9901)) {
 				fav = this.prefAnnée.get(9901);
 			}
 			return fav;
+		}
+		
+		public Set<Musique> getReccomendations() { //à améliorer avec une file à priorité
+			Set<Musique> threeReccomendations = new HashSet<Musique>();
+			Musique top = this.likes.firstElement();
+			for (Musique m : this.likes) {
+				if (m.langue==top.langue) {
+					if (m.genre==top.genre) {
+						if (m.artist==top.artist) {
+							if (m.titre!=top.titre) {threeReccomendations.add(m);}
+						} else {threeReccomendations.add(m);}
+					} else {threeReccomendations.add(m);}
+				}
+				threeReccomendations.add(m);
+			}
+			return threeReccomendations;
 		}
 	}
 
@@ -111,18 +143,15 @@ public class Modele implements Serializable{
 				FileInputStream fis = new FileInputStream(fic);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 
-				this.user = (Modele.User) ois.readObject();
+				this.user = (Modele.User) is.readObject();
 				
 				ois.close();
 				fis.close();
 			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
 				throw new RuntimeException("Impossible de récupérer les données");
 			}
 		}
-	}
-
-	public Modele(Musique[] ms) {
-
 	}
 
 	public void save() {
@@ -152,6 +181,15 @@ public class Modele implements Serializable{
 				ml.add(m);
 				r.put("list", ml);
 			}
+			if (this.repertoireannée.containsKey(m.ann)) {
+				ArrayList al=(ArrayList) this.repertoireannée.get(m.ann);
+				al.add(m);
+				this.repertoireannée.replace(m.ann, al);
+			}else {
+				ArrayList<Musique> al=new ArrayList<Musique>();
+				al.add(m);
+				r.put(ml, al);
+			}
 		} else {
 			Character az = m.titre.charAt(p);
 			if (r.containsKey(az) == false) {
@@ -162,6 +200,12 @@ public class Modele implements Serializable{
 			}
 			ajout(rep, m, p + 1);
 		}
+	}
+	
+	public Object[] getPref() {
+		int pa=user.likeAnn();
+		Object[] pref= {(Object) pa};
+		return pref;
 	}
 
 	public ArrayList trouve(Map r, String titre, int p) {
@@ -182,6 +226,37 @@ public class Modele implements Serializable{
 	public void ajout(Musique m) {
 		ajout(this.repertoireMus, m, 0);
 	}
+	
+	public PriorityQueue preference() {
+		PriorityQueue fp=new PriorityQueue();
+		String[] verifpref={"thisanne"}; //pas sure de cela
+		Object[] userLike=this.getPref();
+		ArrayList pot=new ArrayList(); 
+		for (int i=0;i<userLike.length;i++) {
+			if (i==0) {
+				pot=this.repertoireannée.get(i);
+				for (int j=0;j<userLike.length;j++) {        //<-------utilité pas ouf
+					Musique m=(Modele.Musique) pot.get(j);
+					if (m.ann==(int)userLike[i]) {						
+						m.prefUser++;
+						pot.set(j, m);
+					}
+				}
+			}else {
+				pot=this.repertoireannée.get(i); //<-------------changer les valeur à check
+				for (int j=0;j<userLike.length;j++) {
+					Musique m=(Modele.Musique) pot.get(j);
+					if (m.ann==(int)userLike[i]) {						
+						m.prefUser++;
+						pot.set(j, m);
+					}
+				}
+			}
+		}
+		fp.addAll(pot);
+		return fp;
+		
+	}
 
 	public ArrayList trouve(String titre) {
 		// Musique test=trouve(this.repertoireMus,titre,0);
@@ -189,7 +264,7 @@ public class Modele implements Serializable{
 		return trouve(this.repertoireMus, titre, 0);
 	}
 
-	public ArrayList trouveAll(Map r, String alpha, ArrayList find) {
+	public ArrayList trouveAll(Map r, String alpha, ArrayList find) {//renvoi une liste contenant toutes les musique du répertoire selectionner
 		if (r.containsKey("list")) {
 			find.addAll((Collection) r.get("list"));
 		}
@@ -228,6 +303,7 @@ public class Modele implements Serializable{
 		}
 
 	}
+	
 
 	public void MaJ(Musique m) throws IOException {
 		String update = m.titre + "," + m.dureem + "," + m.dureesec + "," + m.avis + "," + m.descr;
@@ -273,11 +349,12 @@ public class Modele implements Serializable{
 		System.out.println(m.trouve("abc"));
 		System.out.println(m.trouve("ef"));
 		System.out.println(m.trouveAll());
+		System.out.println(m.preference());
 
 		//m.testlisten(hee);
-		int test = m.user.prefAnnée.get(2020);
-		System.out.println(test);
 		m.save();
 	}
 
 }
+
+
