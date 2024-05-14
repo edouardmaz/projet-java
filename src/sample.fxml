@@ -3,6 +3,7 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -237,4 +238,20 @@
    <padding>
       <Insets right="10.0" />
    </padding>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label prefHeight="19.0" prefWidth="292.0" text="Ajoute recemment">
+               <font>
+                  <Font name="Berlin Sans FB" size="24.0" />
+               </font>
+            </Label>
+            <ScrollPane prefHeight="250.0" prefWidth="200.0" styleClass="transparent" stylesheets="@../../style/style.css">
+               <content>
+                  <HBox fx:id="cardLayout" prefHeight="234.0" prefWidth="1346.0" styleClass="transparent" stylesheets="@../../style/style.css" />
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+   </center>
 </BorderPane>
