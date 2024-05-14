@@ -51,8 +51,8 @@ public class Modele implements Serializable {
 		Genre genre;
 		Langue langue;
 		Annee annee;
-		Integer duree;
-		Integer avis;
+		int duree;
+		int[] avis;
 
 		public Musique(String t, String a, Genre g, Langue l, Annee an, Integer d) {
 			this.titre = t;
@@ -61,7 +61,8 @@ public class Modele implements Serializable {
 			this.annee = an;
 			this.langue = l;
 			this.duree = d;
-			this.avis = 0;
+			int[] av = { 0, 0 };
+			this.avis = av;
 		}
 
 		public String toString() {
@@ -71,10 +72,22 @@ public class Modele implements Serializable {
 		@Override
 		public int compareTo(Modele.Musique m) {
 			if (this.perti != m.perti) {
-				return  m.perti-this.perti ;
+				return m.perti - this.perti;
 			} else {
-				return  m.avis-this.avis;
+				return m.avis() - this.avis();
 			}
+		}
+
+		public int avis() {
+			int sa = this.avis[0];
+			int da = this.avis[1];
+			int a;
+			if (sa == 0) {
+				a = 0;
+			} else {
+				a = sa / da;
+			}
+			return a;
 		}
 	}
 
@@ -317,8 +330,9 @@ public class Modele implements Serializable {
 		 */
 	}
 
-	public ArrayList trouve(Map r, String titre, int p) {
+	public ArrayList trouve(Map r, String titre, int p, int check) {
 		ArrayList find = new ArrayList();
+		ArrayList findalt = new ArrayList();
 		find.add("musique non trouvée");
 		if (titre.length() == p) {
 			// find = (ArrayList) r.get("list");
@@ -326,9 +340,25 @@ public class Modele implements Serializable {
 		} else {
 			Character az = titre.charAt(p);
 			if (r.containsKey(az)) {
-				find = trouve((Map) r.get(az), titre, p + 1);
+				find = trouve((Map) r.get(az), titre, p + 1, check);
+			}
+			if (p == 0) {
+				String alp = "abcdefghijklmnopqrstuvwxyz";
+				for (int i = 0; i < alp.length(); i++) {
+					Character altz = alp.charAt(i);
+					if (r.containsKey(altz)) {
+						ArrayList test = trouve((Map) r.get(altz), titre, p, 0);
+						if (test.get(0)!="musique non trouvée") {							
+							find.addAll(trouve((Map) r.get(altz), titre, p, 0));
+						}
+					}
+				}
 			}
 		}
+		if (p == 0 && check == 1) {
+			find.addAll(findalt);
+		}
+		//System.out.println(find);
 		return find;
 	}
 
@@ -353,7 +383,6 @@ public class Modele implements Serializable {
 			if (pot.size() == 0 && userLike[i] != null) { // I want to fucking die
 				for (int j = 0; j < userLike.length; j++) {
 					Musique m = (Modele.Musique) pot.get(j);
-					// add case switch
 					switch (i) {
 					case 0:
 						if (m.genre == userLike[i]) {
@@ -428,14 +457,13 @@ public class Modele implements Serializable {
 		}
 		for (int i = 0; i < userLike.length; i++) {
 			if (pot.size() == 0 && userLike[i] != null) { // I want to fucking die
-				// add case switch
-				switch(i) {
+				switch (i) {
 				case 0:
-					pot=this.repertoiregenre.get(userLike[i]);
-				break;
+					pot = this.repertoiregenre.get(userLike[i]);
+					break;
 				case 1:
 					pot = this.repertoireannée.get(userLike[i]);
-				break;
+					break;
 				case 2:
 					pot = this.repertoirelangue.get(userLike[i]);
 					break;
@@ -444,25 +472,24 @@ public class Modele implements Serializable {
 					break;
 				}
 			} else if (pot.size() != 0 && userLike[i] != null) {
-				// add case switch
 				int j = 0;
-				while (j != pot.size()) { 
+				while (j != pot.size()) {
 					Musique m = (Modele.Musique) pot.get(j);
-					switch(i) {
+					switch (i) {
 					case 0:
-						if (m.genre == userLike[i]) { 
+						if (m.genre == userLike[i]) {
 							j++;
 						} else {
 							pot.remove(j);
 						}
-					break;
+						break;
 					case 1:
 						if (m.annee == userLike[i]) {
 							j++;
 						} else {
 							pot.remove(j);
 						}
-					break;
+						break;
 					case 2:
 						if (m.langue == userLike[i]) {
 							j++;
@@ -480,14 +507,16 @@ public class Modele implements Serializable {
 					}
 				}
 			}
-		}filtre.addAll(pot);return filtre;
+		}
+		filtre.addAll(pot);
+		return filtre;
 
 	}
 
 	public ArrayList trouve(String titre) {
 		// Musique test=trouve(this.repertoireMus,titre,0);
 		// System.out.println(test);
-		return trouve(this.repertoireMus, titre, 0);
+		return trouve(this.repertoireMus, titre, 0, 1);
 	}
 
 	public ArrayList trouveAll(Map r, String alpha, ArrayList find) {// renvoi une liste contenant toutes les musique du
@@ -515,6 +544,9 @@ public class Modele implements Serializable {
 	}
 
 	public void makeBDD() throws IOException {
+		File test = new File("Musiques");
+		File[] tets = test.listFiles();
+		System.out.println(tets[0]);
 		FileReader in = new FileReader("musique");
 		try (BufferedReader br = new BufferedReader(in)) {
 			String bdd = br.readLine();
@@ -563,6 +595,25 @@ public class Modele implements Serializable {
 		ajout(m);
 	}
 
+	public void addavis(int avi, Musique m) {
+		m.avis[0] = m.avis[0] + avi;
+		m.avis[1]++;
+	}
+
+	public PriorityQueue pertinence(String t, Object[] f, Object[] s) { // taiter cas ou pas de musique(message
+																		// d'erreur)
+		PriorityQueue recherche = new PriorityQueue();
+		ArrayList base = new ArrayList();
+		if (t.isBlank()) {
+			base = this.trouveAll();
+		} else {
+			base = this.trouve(t);
+		}
+		base = this.filter(base, f);
+		recherche = this.sort(base, s);
+		return recherche;
+	}
+
 	public void testlisten(Musique m) {
 		this.user.statGenre(m.genre);
 		this.user.statAnnée(m.annee);
@@ -579,6 +630,7 @@ public class Modele implements Serializable {
 		m.ajout(dhee);
 		System.out.println(m.trouveAll());
 		System.out.println(m.trouve("te"));
+		Object[] tn = { null, null, null, null, null };
 		Object[] tfil = { Genre.pop, null, null, null, null };
 		Object[] tsor = { Genre.rap, null, null, null, null };
 		Object[] t2fil = { null, Annee.a00, null, null, null };
@@ -587,8 +639,10 @@ public class Modele implements Serializable {
 		System.out.println(m.filter(m.trouve("te"), tfil));
 		System.out.println(m.filter(m.trouveAll(), t2fil));
 		System.out.println(m.preference());
+		// m.addavis(5, hee);
+		System.out.println(m.pertinence("tes", tn, tn));
 
-		//m.testlisten(hee);
+		// m.testlisten(hee);
 		m.save();
 	}
 
