@@ -1,3 +1,5 @@
+package sample;
+
 import java.util.Dictionary;
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,10 +53,10 @@ public class Modele implements Serializable {
 		Genre genre;
 		Langue langue;
 		Annee annee;
-		int duree;
+		String duree;
 		int[] avis;
 
-		public Musique(String t, String a, Genre g, Langue l, Annee an, Integer d) {
+		public Musique(String t, String a, Genre g, Langue l, Annee an, String d) {
 			this.titre = t;
 			this.artist = a;
 			this.genre = g;
@@ -218,7 +220,7 @@ public class Modele implements Serializable {
 
 	}
 
-	public Modele() {
+	public Modele() throws IOException {
 		if (fic.exists()) {
 
 			try {
@@ -234,6 +236,7 @@ public class Modele implements Serializable {
 				throw new RuntimeException("Impossible de récupérer les données");
 			}
 		}
+		//this.makeBDD();
 	}
 
 	public void save() {
@@ -332,7 +335,6 @@ public class Modele implements Serializable {
 
 	public ArrayList trouve(Map r, String titre, int p, int check) {
 		ArrayList find = new ArrayList();
-		ArrayList findalt = new ArrayList();
 		find.add("musique non trouvée");
 		if (titre.length() == p) {
 			// find = (ArrayList) r.get("list");
@@ -348,17 +350,17 @@ public class Modele implements Serializable {
 					Character altz = alp.charAt(i);
 					if (r.containsKey(altz)) {
 						ArrayList test = trouve((Map) r.get(altz), titre, p, 0);
-						if (test.get(0)!="musique non trouvée") {							
-							find.addAll(trouve((Map) r.get(altz), titre, p, 0));
+						if (test.get(0)!="musique non trouvée") {
+							if (find.get(0)=="musique non trouvée") {
+								find=test;
+							}else {								
+								find.addAll(test);
+							}
 						}
 					}
 				}
 			}
 		}
-		if (p == 0 && check == 1) {
-			find.addAll(findalt);
-		}
-		//System.out.println(find);
 		return find;
 	}
 
@@ -544,27 +546,31 @@ public class Modele implements Serializable {
 	}
 
 	public void makeBDD() throws IOException {
-		File test = new File("Musiques");
+		/*File test = new File("Musiques");
 		File[] tets = test.listFiles();
-		System.out.println(tets[0]);
+		File te=tets[0];
+		String sn=te.getName();
+		System.out.println(sn);*/
 		FileReader in = new FileReader("musique");
 		try (BufferedReader br = new BufferedReader(in)) {
 			String bdd = br.readLine();
 			String[] musbd = bdd.split(";");
 			for (int i = 0; i < musbd.length; i++) {
 				String[] mu = musbd[i].split(",");
-				int m1 = mu[1].codePointAt(0) - 48;
-				int m2 = (mu[2].codePointAt(0) - 48) * 10 + mu[2].codePointAt(1) - 48;
-				int m3 = mu[3].codePointAt(0) - 48;
-				// Musique a = new Musique(mu[0], m1, m2, m3, mu[4]);
-				// ajout(a);
+				//int m1 = mu[4].codePointAt(0) - 48;
+				Genre g= Genre.valueOf(mu[2]);
+				Langue l=Langue.valueOf(mu[3]);
+				Annee an=Annee.valueOf(mu[4]);
+				Musique a = new Musique(mu[0], mu[1], g, l, an,mu[5]);
+				ajout(a);
 			}
 		}
 
 	}
 
 	public void MaJ(Musique m) throws IOException {
-		String update = m.titre + "," + m.duree + "," + m.avis;
+		String update = m.titre + "," +m.artist+ ","+m.genre+ ","+m.langue+ ","
+		+m.annee+ ","+ m.duree;
 		FileReader in = new FileReader("musique");
 		try (BufferedReader br = new BufferedReader(in)) {
 			String bdd = br.readLine();
@@ -624,8 +630,8 @@ public class Modele implements Serializable {
 	public static void main(String[] args) throws IOException {
 		Modele m = new Modele();
 		m.makeBDD();
-		Musique hee = m.new Musique("test", "Twewy", Genre.rap, Langue.anglais, Annee.a00, 180);
-		Musique dhee = m.new Musique("dtest", "Twewy", Genre.pop, Langue.anglais, Annee.a00, 180);
+		Musique hee = m.new Musique("test", "Twewy", Genre.rap, Langue.anglais, Annee.a00, "180");
+		Musique dhee = m.new Musique("dtest", "Twewy", Genre.pop, Langue.anglais, Annee.a00,"180");
 		m.ajout(hee);
 		m.ajout(dhee);
 		System.out.println(m.trouveAll());
